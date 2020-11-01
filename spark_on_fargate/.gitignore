@@ -1,0 +1,33 @@
+# SBT
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
+
+# Scala
+*.class
+*.log
+
+# Spark
+metastore_db/
+spark-warehouse/
+
+# Mac OS X
+.DS_Store
+
+# IDEA
+*.iml
+*.ipr
+*.iws
+.idea
+out
+
+# Metals
+.metals/
+.bloop/
+project/metals.sbt
