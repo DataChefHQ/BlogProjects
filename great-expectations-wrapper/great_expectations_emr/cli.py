@@ -5,13 +5,11 @@ from typing import List
 
 from great_expectations import DataContext
 from pyspark.sql import SparkSession
-import logging
 
 import typer
 import yaml
 
 from great_expectations_emr.helpers import get_relative_path
-from great_expectations_emr.s3_store import move_previous_validations
 from great_expectations_emr.utils import update_ge_config
 
 SuiteInfo = namedtuple(
@@ -56,8 +54,6 @@ DEFAULT_SPARK_HOME = "/usr/lib/spark"
 DEFAULT_CONTEXT_ROOT = get_relative_path("great_expectations")
 APP_NAME = "great_expectations_wrapper"
 
-logger = logging.getLogger(APP_NAME)
-
 
 @app.command(APP_NAME)
 def run(
@@ -78,18 +74,13 @@ def run(
         os.environ["SPARK_HOME"] = DEFAULT_SPARK_HOME
 
     # You probably want to check if the pipeline is passed
+    print(context_root_dir)
     suites = get_suites(pipeline)
     print("Suites have been loaded")
-    print(suites)
 
     keep_s3_history = False
     s3_prefix = "data_doc/"
     update_ge_config(context_root_dir, s3_bucket, keep_s3_history, s3_prefix)
-
-    if s3_bucket:
-        move_previous_validations(s3_bucket, source_prefix="data_doc/")
-    else:
-        move_previous_validations()
 
     for suite in suites:
         print(f"Working on suite {suite}")

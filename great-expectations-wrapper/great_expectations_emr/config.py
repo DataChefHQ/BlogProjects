@@ -10,7 +10,7 @@ class GreatExpectationConfig:
     config and dynamically changes based on the provided input. The default
     config is configured to run on local machine. However using this dynamic
     config interface, it's possible to automatically change the config file on
-    the run time.
+    run time.
 
     :param path: The default config file path.
     :type path: str
