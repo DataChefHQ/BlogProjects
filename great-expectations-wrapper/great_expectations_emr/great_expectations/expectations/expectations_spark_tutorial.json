@@ -44,6 +44,6 @@
     }
   ],
   "meta": {
-    "great_expectations.__version__": "0.11.9"
+    "great_expectations.__version__": "0.13.10"
   }
 }

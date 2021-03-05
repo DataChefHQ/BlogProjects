@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import List
 
 from great_expectations import DataContext
+from great_expectations.checkpoint import LegacyCheckpoint
 from pyspark.sql import SparkSession
 
 import typer
@@ -111,20 +112,26 @@ def generate_dashboard(
 
     # Create a DataContext for the provided suite
     context = DataContext(context_root_dir)
-    suite = context.get_expectation_suite(suite_name)
     df = spark_session.table(f"{database_name}.{table_name}")
 
     batch_kwargs = {"dataset": df, "datasource": "spark_datasource"}
 
-    # Run the validation operator on the DataContext
-    run_id = get_run_id(suite_name)
-    batch = context.get_batch(batch_kwargs, suite)
-    results = context.run_validation_operator(
-        "action_list_operator", [batch], run_id=run_id
+    # Making use of the new checkpoints instead of the validation operator
+    checkpoint = LegacyCheckpoint(
+        name=app_name,
+        data_context=context,
+        batches=[
+            {
+                "batch_kwargs":  batch_kwargs,
+                "expectation_suite_names": [suite_name]
+            }
+        ]
     )
-    context.build_data_docs()
 
-    print(results)
+    # Run the checkpoint
+    results = checkpoint.run()
+
+    context.build_data_docs()
 
     if not results["success"]:
         print("No results")

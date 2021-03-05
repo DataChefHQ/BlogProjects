@@ -2,7 +2,7 @@ anonymous_usage_statistics:
   data_context_id: 8b4da655-7787-44c2-a32a-f276d8141a2e
   enabled: true
 config_variables_file_path: uncommitted/config_variables.yml
-config_version: 2.0
+config_version: 3.0
 data_docs_sites:
   local_site:
     class_name: SiteBuilder
@@ -42,14 +42,14 @@ stores:
 validation_operators:
   action_list_operator:
     action_list:
-    - action:
-        class_name: StoreValidationResultAction
-      name: store_validation_result
-    - action:
-        class_name: StoreEvaluationParametersAction
-      name: store_evaluation_params
-    - action:
-        class_name: UpdateDataDocsAction
-      name: update_data_docs
+      - action:
+          class_name: StoreValidationResultAction
+        name: store_validation_result
+      - action:
+          class_name: StoreEvaluationParametersAction
+        name: store_evaluation_params
+      - action:
+          class_name: UpdateDataDocsAction
+        name: update_data_docs
     class_name: ActionListValidationOperator
 validations_store_name: validations_store
