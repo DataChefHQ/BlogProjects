@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+sudo -u ec2-user -i <<EOF
+echo ". /home/ec2-user/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc
+conda run --prefix ~/SageMaker/envs/julia/ julia --eval 'using IJulia; IJulia.installkernel("Julia")'
+EOF

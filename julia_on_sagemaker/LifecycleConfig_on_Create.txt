@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+sudo -u ec2-user -i <<EOF
+echo ". /home/ec2-user/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc 
+conda create --yes --prefix ~/SageMaker/envs/julia
+curl --silent https://julialang-s3.julialang.org/bin/linux/x64/1.6/julia-1.6.0-linux-x86_64.tar.gz | tar xzf -
+cp -R julia-1.6.0/* ~/SageMaker/envs/julia/
+mkdir -p ~/SageMaker/envs/julia/etc/conda/activate.d
+echo 'export JULIA_DEPOT_PATH=~/SageMaker/envs/julia/depot' >> ~/SageMaker/envs/julia/etc/conda/activate.d/env.sh
+echo -e 'empty!(DEPOT_PATH)\npush!(DEPOT_PATH,raw"/home/ec2-user/SageMaker/envs/julia/depot")' >> ~/SageMaker/envs/julia/etc/julia/startup.jl
+conda activate /home/ec2-user/SageMaker/envs/julia
+julia --eval 'using Pkg; Pkg.add("IJulia"); using IJulia'
+EOF

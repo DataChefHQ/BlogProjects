@@ -1,0 +1,143 @@
+Description: Basic NotebookInstance test
+Parameters:
+  NotebookName:
+    Description: SageMaker Notebook instance name
+    Type: String
+  VolumeSize:
+    Description: SageMaker Notebook instance EBS Volume Size (must be an integer value)
+    Type: Number
+    Default: 5
+  InstanceType:
+    Description: SageMaker Notebook instance type
+    Type: String
+    Default: ml.t2.medium
+    AllowedValues:
+      - ml.t3.large
+      - ml.t3.xlarge
+      - ml.t3.2xlarge
+      - ml.t2.medium
+      - ml.t2.large
+      - ml.t2.xlarge
+      - ml.t2.2xlarge
+      - ml.m5.xlarge
+      - ml.m5.2xlarge
+      - ml.m5.4xlarge
+      - ml.m5.12xlarge
+      - ml.m5.24xlarge
+      - ml.m4.xlarge
+      - ml.m4.2xlarge
+      - ml.m4.4xlarge
+      - ml.m4.10xlarge
+      - ml.m4.16xlarge
+      - ml.c5.xlarge
+      - ml.c5.2xlarge
+      - ml.c5.4xlarge
+      - ml.c5.9xlarge
+      - ml.c5.18xlarge
+      - ml.c5d.xlarge
+      - ml.c5d.2xlarge
+      - ml.c5d.4xlarge
+      - ml.c5d.9xlarge
+      - ml.c5d.18xlarge
+      - ml.c4.xlarge
+      - ml.c4.2xlarge
+      - ml.c4.4xlarge
+      - ml.c4.8xlarge
+      - ml.p3.2xlarge
+      - ml.p3.8xlarge
+      - ml.p3.16xlarge
+      - ml.p2.xlarge
+      - ml.p2.8xlarge
+      - ml.p2.16xlarge
+    ConstraintDescription: must be a valid SageMaker Notebook instance type.
+Resources:
+  BasicNotebookInstance:
+    Type: 'AWS::SageMaker::NotebookInstance'
+    Properties:
+      NotebookInstanceName: !Ref NotebookName
+      InstanceType: !Ref InstanceType
+      RoleArn: !GetAtt 
+        - ExecutionRole
+        - Arn
+      LifecycleConfigName: !GetAtt 
+        - BasicNotebookInstanceLifecycleConfig
+        - NotebookInstanceLifecycleConfigName
+      VolumeSizeInGB: !Ref VolumeSize
+
+  BasicNotebookInstanceLifecycleConfig:
+    Type: 'AWS::SageMaker::NotebookInstanceLifecycleConfig'
+    Properties:
+      OnCreate:
+        - Content: !Base64 >
+            #!/bin/bash
+
+            set -e
+
+            sudo -u ec2-user -i <<EOF
+
+            echo ". /home/ec2-user/anaconda3/etc/profile.d/conda.sh" >>
+            ~/.bashrc 
+
+            conda create --yes --prefix ~/SageMaker/envs/julia
+
+            curl --silent
+            https://julialang-s3.julialang.org/bin/linux/x64/1.6/julia-1.6.0-linux-x86_64.tar.gz
+            | tar xzf -
+
+            cp -R julia-1.6.0/* ~/SageMaker/envs/julia/
+
+            mkdir -p ~/SageMaker/envs/julia/etc/conda/activate.d
+
+            echo 'export JULIA_DEPOT_PATH=~/SageMaker/envs/julia/depot' >>
+            ~/SageMaker/envs/julia/etc/conda/activate.d/env.sh
+
+            echo -e
+            'empty!(DEPOT_PATH)\npush!(DEPOT_PATH,raw"/home/ec2-user/SageMaker/envs/julia/depot")'
+            >> ~/SageMaker/envs/julia/etc/julia/startup.jl
+
+            conda activate /home/ec2-user/SageMaker/envs/julia
+
+            julia --eval 'using Pkg; Pkg.add("IJulia"); using IJulia'
+
+            EOF
+      OnStart:
+        - Content: !Base64 >
+            #!/bin/bash
+
+            set -e
+
+            sudo -u ec2-user -i <<EOF
+
+            echo ". /home/ec2-user/anaconda3/etc/profile.d/conda.sh" >>
+            ~/.bashrc
+
+            conda run --prefix ~/SageMaker/envs/julia/ julia --eval 'using
+            IJulia; IJulia.installkernel("Julia")'
+
+            EOF
+  ExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - sagemaker.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: '*'
+                Resource: '*'
+Outputs:
+  BasicNotebookInstanceId:
+    Value: !Ref BasicNotebookInstance
+  BasicNotebookInstanceLifecycleConfigId:
+    Value: !Ref BasicNotebookInstanceLifecycleConfig
