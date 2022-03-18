@@ -1,4 +1,8 @@
-Description: This template create a SageMaker notebook instance along with a lifecycle configuration that add the Julia programming language to it as a kernel. For more information see: https://datachef.co/blog/machine-learning-with-julia-on-aws-sagemaker/
+Description: >-
+  This template create a SageMaker notebook instance along with a lifecycle
+  configuration that add the Julia programming language to it as a kernel For
+  more information see
+  "https://datachef.co/blog/machine-learning-with-julia-on-aws-sagemaker/"
 Parameters:
   NotebookName:
     Description: SageMaker Notebook instance name
@@ -63,7 +67,6 @@ Resources:
         - BasicNotebookInstanceLifecycleConfig
         - NotebookInstanceLifecycleConfigName
       VolumeSizeInGB: !Ref VolumeSize
-
   BasicNotebookInstanceLifecycleConfig:
     Type: 'AWS::SageMaker::NotebookInstanceLifecycleConfig'
     Properties:
