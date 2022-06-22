@@ -1,2 +1,12 @@
+# Jupyter Notebook
+.ipynb_checkpoints
 
-a_graph_convolution_network_in_sagemaker/.DS_Store
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# DS_Store
+.DS_Store
