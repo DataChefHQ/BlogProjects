@@ -1,0 +1,1 @@
+print('Hello from python-shell glue job, created by cdk!')
