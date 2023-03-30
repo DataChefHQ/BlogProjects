@@ -1,0 +1,49 @@
+{
+  "data_asset_type": "SparkDFDataset",
+  "expectation_suite_name": "expectations_spark_tutorial",
+  "expectations": [
+    {
+      "expectation_type": "expect_table_columns_to_match_ordered_list",
+      "kwargs": {
+        "column_list": [
+          "name",
+          "phone"
+        ]
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "name"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "name",
+        "type_": "StringType"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "phone"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "phone",
+        "type_": "StringType"
+      },
+      "meta": {}
+    }
+  ],
+  "meta": {
+    "great_expectations.__version__": "0.13.10"
+  }
+}
