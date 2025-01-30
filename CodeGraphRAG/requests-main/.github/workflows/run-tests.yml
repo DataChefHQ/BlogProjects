@@ -1,0 +1,71 @@
+name: Tests
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy-3.9", "pypy-3.10"]
+        os: [ubuntu-22.04, macOS-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+        allow-prereleases: true
+    - name: Install dependencies
+      run: |
+        make
+    - name: Run tests
+      run: |
+        make ci
+
+  no_chardet:
+    name: "No Character Detection"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938
+      - name: 'Set up Python 3.8'
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: |
+          make
+          python -m pip uninstall -y "charset_normalizer" "chardet"
+      - name: Run tests
+        run: |
+          make ci
+
+  urllib3:
+    name: 'urllib3 1.x'
+    runs-on: 'ubuntu-latest'
+    strategy:
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938
+      - name: 'Set up Python 3.8'
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: |
+          make
+          python  -m pip install "urllib3<2"
+      - name: Run tests
+        run: |
+          make ci
