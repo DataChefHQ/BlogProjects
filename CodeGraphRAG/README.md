@@ -2,6 +2,9 @@
 
 Check the companion blog post for more info.
 
+## Full Notebook
+Check out the  `CodeGraphRAG.ipynb`.
+
 ## Usage
 
 ```
